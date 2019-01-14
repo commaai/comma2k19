@@ -1,0 +1,10 @@
+numpy
+scipy
+tqdm==4.23.1
+IPython<6.0
+ipykernel<5.0
+jupyter-console==5.1.0
+jupyter
+seaborn
+matplotlib<3.0
+opencv-python-headless
