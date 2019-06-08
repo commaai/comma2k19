@@ -129,5 +129,8 @@ as follows:
                       rotate from ECEF  frame to local camera frame
                       defined as [forward, right, down] (hamilton quaternion!!!!)
 ```
+## Workaround for Microsoft-based filesystems
+ExFat and NTFS, among others, do not allow for `|`, the pipe character, in file and directory names. If you are using Microsoft-based filesystems, a workaround is to move the dataset to a non-Microsoft filesystem, decompress the archives there and run `python3 unzip_msft_fs.py <dataset dir> <goal dir>` where `<dataset dir>` contains all chunks as zip files and `<goal dir>` is the directory you want the zip files extracted to. This will expand all the zip files in parallel and replace the pipe character with an underscore at every occurrence on the fly.
+
 ## Contact
 For questions, concerns or suggestions please contact harald@comma.ai
