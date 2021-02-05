@@ -1,5 +1,5 @@
 import numpy as np
-import orientation as orient
+import utils.orientation as orient
 
 FULL_FRAME_SIZE = (1164, 874)
 W, H = FULL_FRAME_SIZE[0], FULL_FRAME_SIZE[1]
@@ -13,7 +13,6 @@ eon_intrinsics = np.array([
 
 # aka 'K_inv' aka view_frame_from_camera_frame
 eon_intrinsics_inv = np.linalg.inv(eon_intrinsics)
-
 
 # device/mesh : x->forward, y-> right, z->down
 # view : x->right, y->down, z->forward

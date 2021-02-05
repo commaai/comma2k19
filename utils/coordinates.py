@@ -1,10 +1,9 @@
-import numpy as np
-"""
+'''
 Coordinate transformation module. All methods accept arrays as input
 with each row as a position.
-"""
+'''
 
-
+import numpy as np
 
 a = 6378137
 b = 6356752.3142

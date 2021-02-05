@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-"""
+'''
 This script is a workaround for Microsoft-based filesystems (exFat, NTFS etc).
 These filesystems don't allow the vertical pipe ('|') in paths.
 So, instead of unzipping files manually, run this script which will replace
@@ -7,7 +6,8 @@ all pipes in path names in the zip files by underscores.
 
 Usage:
 python3 unzip_msft_fs.py <dataset dir> <goal dir>
-"""
+'''
+
 import multiprocessing
 import os
 import shutil
