@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -18,6 +18,8 @@ jobs:
         run: |
           sudo apt-get install libcurl4-openssl-dev
           sudo apt-get install libssl-dev
+          sudo apt-get update
+          sudo apt-get install ffmpeg 
       - name: Requirements
         run: |
           echo "PYTHONPATH=openpilot" >> $GITHUB_ENV
