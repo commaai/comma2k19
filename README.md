@@ -1,11 +1,11 @@
 # comma2k19
 [comma.ai](https://comma.ai) presents comma2k19, a dataset of over 33 hours of commute in California's 280 highway. This means 2019 segments, 1 minute long each, on a 20km section of highway driving between California's San Jose and San Francisco. comma2k19 is a fully reproducible and scalable dataset. The data was collected using comma [EONs](https://comma.ai/shop/products/eon-gold-dashcam-devkit/) that has sensors similar to those of any modern smartphone including a road-facing camera, phone GPS, thermometers and 9-axis IMU. Additionally, the EON captures raw GNSS measurements and all CAN data sent by the car with a comma [grey panda](https://comma.ai/shop/products/panda-obd-ii-dongle/). 
 
-![Alt](_static/testmesh3d.png "Path and lanes projected onto image")
+![Alt](assets/testmesh3d.png "Path and lanes projected onto image")
 
 Here we also introduced [Laika](https://github.com/commaai/laika), an open-source GNSS processing library. Laika produces 40% more accurate positions than the GNSS module used to collect the raw data. This dataset includes pose (position + orientation) estimates in a global reference frame of the recording camera. These poses were computed with a tightly coupled INS/GNSS/Vision optimizer that relies on data processed by Laika. comma2k19 is ideal for development and validation of tightly coupled GNSS algorithms and mapping algorithms that work with commodity sensors. 
 
-![Alt](_static/merged.png "Mapping experiment based on poses from this dataset")
+![Alt](assets/merged.png "Mapping experiment based on poses from this dataset")
 
 
 ## Publication
@@ -130,7 +130,7 @@ as follows:
                       defined as [forward, right, down] (hamilton quaternion!!!!)
 ```
 ## Workaround for Microsoft-based filesystems
-ExFat and NTFS, among others, do not allow for `|`, the pipe character, in file and directory names. If you are using Microsoft-based filesystems, a workaround is to move the dataset to a non-Microsoft filesystem, decompress the archives there and run `python3 unzip_msft_fs.py <dataset dir> <goal dir>` where `<dataset dir>` contains all chunks as zip files and `<goal dir>` is the directory you want the zip files extracted to. This will expand all the zip files in parallel and replace the pipe character with an underscore at every occurrence on the fly.
+ExFat and NTFS, among others, do not allow for `|`, the pipe character, in file and directory names. If you are using Microsoft-based filesystems, a workaround is to move the dataset to a non-Microsoft filesystem, decompress the archives there and run `python3 utils/unzip_msft_fs.py <dataset dir> <goal dir>` where `<dataset dir>` contains all chunks as zip files and `<goal dir>` is the directory you want the zip files extracted to. This will expand all the zip files in parallel and replace the pipe character with an underscore at every occurrence on the fly.
 
 ## Contact
 For questions, concerns or suggestions please contact harald@comma.ai
