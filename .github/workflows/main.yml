@@ -1,0 +1,28 @@
+name: comma2k19
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          lfs: true
+      - name: Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Dependencies
+        run: |
+          sudo apt-get install libcurl4-openssl-dev
+          sudo apt-get install libssl-dev
+          sudo apt-get update
+          sudo apt-get install ffmpeg 
+      - name: Requirements
+        run: |
+          echo "PYTHONPATH=openpilot" >> $GITHUB_ENV
+          pip install -r requirements.txt
+      - name: Dataset
+        run: python utils/dataset.py

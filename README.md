@@ -1,11 +1,11 @@
 # comma2k19
 [comma.ai](https://comma.ai) presents comma2k19, a dataset of over 33 hours of commute in California's 280 highway. This means 2019 segments, 1 minute long each, on a 20km section of highway driving between California's San Jose and San Francisco. comma2k19 is a fully reproducible and scalable dataset. The data was collected using comma [EONs](https://comma.ai/shop/products/eon-gold-dashcam-devkit/) that has sensors similar to those of any modern smartphone including a road-facing camera, phone GPS, thermometers and 9-axis IMU. Additionally, the EON captures raw GNSS measurements and all CAN data sent by the car with a comma [grey panda](https://comma.ai/shop/products/panda-obd-ii-dongle/). 
 
-![Alt](testmesh3d.png "Path and lanes projected onto image")
+![Alt](assets/testmesh3d.png "Path and lanes projected onto image")
 
 Here we also introduced [Laika](https://github.com/commaai/laika), an open-source GNSS processing library. Laika produces 40% more accurate positions than the GNSS module used to collect the raw data. This dataset includes pose (position + orientation) estimates in a global reference frame of the recording camera. These poses were computed with a tightly coupled INS/GNSS/Vision optimizer that relies on data processed by Laika. comma2k19 is ideal for development and validation of tightly coupled GNSS algorithms and mapping algorithms that work with commodity sensors. 
 
-![Alt](merged.png "Mapping experiment based on poses from this dataset")
+![Alt](assets/merged.png "Mapping experiment based on poses from this dataset")
 
 
 ## Publication
@@ -23,11 +23,11 @@ Eprint = {arXiv:1812.05752},
 The total dataset is ~100GB and can be downloaded [here](http://academictorrents.com/details/65a2fbc964078aff62076ff4e103f18b951c5ddb) It is divided into ~10GB chunks.
 
 ## Example Code
-There is an example data segment in this repo for experimentation. There are also some notebooks with some example code. Including a position benchmark. This code has only been tested on python 2.x and ubuntu 16.04. Make sure to `pip install -r requirements_examples.txt` if you do not have the relevant packages installed already.
+There is an example data segment in this repo for experimentation. There are also some notebooks with some example code. Including a position benchmark. This code has only been tested on python 2.7 and python 3.6. Make sure to `pip install -r requirements.txt` if you do not have the relevant packages installed already. Additionally, make sure to add the `openpilot` submodule and `notebooks/lib` module to your `PYTHONPATH`.
 The examples contain a 1 minute sample segment and some sample notebooks.
 * processed_readers: some examples of data reading and plotting
 * position_benchmarks: example of running the position benchmark used to evaluate fix quality
-* raw_readers: example of using [openpilot_tools](https://github.com/commaai/openpilot-tools)
+* raw_readers: example of using [OpenPilot tools](https://github.com/commaai/openpilot/tree/master/tools)
 
 For examples related to raw GNSS please check out [Laika](https://github.com/commaai/laika)
 
@@ -130,7 +130,7 @@ as follows:
                       defined as [forward, right, down] (hamilton quaternion!!!!)
 ```
 ## Workaround for Microsoft-based filesystems
-ExFat and NTFS, among others, do not allow for `|`, the pipe character, in file and directory names. If you are using Microsoft-based filesystems, a workaround is to move the dataset to a non-Microsoft filesystem, decompress the archives there and run `python3 unzip_msft_fs.py <dataset dir> <goal dir>` where `<dataset dir>` contains all chunks as zip files and `<goal dir>` is the directory you want the zip files extracted to. This will expand all the zip files in parallel and replace the pipe character with an underscore at every occurrence on the fly.
+ExFat and NTFS, among others, do not allow for `|`, the pipe character, in file and directory names. If you are using Microsoft-based filesystems, a workaround is to move the dataset to a non-Microsoft filesystem, decompress the archives there and run `python3 utils/unzip_msft_fs.py <dataset dir> <goal dir>` where `<dataset dir>` contains all chunks as zip files and `<goal dir>` is the directory you want the zip files extracted to. This will expand all the zip files in parallel and replace the pipe character with an underscore at every occurrence on the fly.
 
 ## Contact
 For questions, concerns or suggestions please contact harald@comma.ai

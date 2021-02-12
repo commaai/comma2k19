@@ -18,9 +18,9 @@ def get_altitude_errors(frame_poss):
   east_bounds = [-1000, 7000]
   binsize = 5
   north_bins, east_bins = [], []
-  for i in xrange(north_bounds[0], north_bounds[1], binsize):
+  for i in range(north_bounds[0], north_bounds[1], binsize):
     north_bins.append([i,i+binsize])
-  for i in xrange(east_bounds[0], east_bounds[1], binsize):
+  for i in range(east_bounds[0], east_bounds[1], binsize):
     east_bins.append([i,i+binsize])
 
   # convert positions to NED
@@ -31,7 +31,7 @@ def get_altitude_errors(frame_poss):
     frame_poss_ned.append(local.ecef2ned(pos))
 
   # find bin idxs for all frame positions
-  bins = [[[] for j in xrange(len(east_bins))] for i in xrange(len(north_bins))]
+  bins = [[[] for j in range(len(east_bins))] for i in range(len(north_bins))]
   for pos_ned in frame_poss_ned:
     north_idxs = np.clip(((pos_ned[:,0] - north_bounds[0])/binsize).astype(int),
                          0,
