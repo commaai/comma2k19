@@ -70,6 +70,7 @@ processed_log
 |  +--wheel_speeds: [front_left, front_right, rear_left, rear_right] (m/s)
 |  +--radar: [forward distance (m),
 |  |          left distance (m),
+|  |          relative speed (m/s),
 |  |          nan,
 |  |          nan,
 |  |          address,
