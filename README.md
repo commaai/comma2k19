@@ -93,7 +93,7 @@ processed_log
    |                    bearing (deg)]
    |
    +--raw_gnss_qcom: every row represents a measurement
-   |                 of 1 sattelite at 1 epoch can easily
+   |                 of 1 satellite at 1 epoch can easily
    |                 be manipulated with laika.
    |                 [prn (nmea_id, see laika),
    |                  week of gps_time of reception (gps_week),
@@ -104,7 +104,7 @@ processed_log
    |                  pseudorange_rate (m/s),
    |                  pseudorange_rate_std (m/s)]
    +--raw_gnss_ublox: every row represents a measurement
-                      of 1 sattelite at 1 epoch can easily
+                      of 1 satellite at 1 epoch can easily
                       be manipulated with laika.
                       [prn (nmea_id, see laika),
                        week of gps_time of reception (gps_week),
