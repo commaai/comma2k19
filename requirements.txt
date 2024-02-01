@@ -3,7 +3,7 @@ scons==4.0.1
 six==1.15.0
 jinja2==2.11.3
 sympy==1.7.1
-scikit-learn==0.24.0
+scikit-learn==1.0.1
 cffi==1.14.4
 matplotlib==3.3.3
 pkgconfig==1.5.1
