@@ -4,7 +4,7 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 
-example_segment = '/home/yajiri/Thesis/comma2k/Chunk_1/b0c9d2329ad1606b|2018-08-17--12-07-08'
+example_segment = '../comma2k/Chunk_1/b0c9d2329ad1606b|2018-08-17--12-07-08'
 
 sys.path.append('..')
 os.listdir(example_segment) # all the files present for every minute of driving
