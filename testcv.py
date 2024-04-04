@@ -49,6 +49,7 @@ while True:
     rgb = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
     #overlay the vectors on the frame
     result = cv2.addWeighted(frame, 1, rgb, 2, 0)
+    #result to see the vectors, frame to remove them.
     cv2.imshow("input", result)
 
     #update previous frame
