@@ -32,8 +32,6 @@ while True:
     #Read frames
     ret, frame = video_capture.read()
     draw_grid(frame, rows,cols)
-    #show input frame, add if wanted 
-    cv2.imshow("input", frame)
     #convert to gray scale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     #calc dense optical flow
@@ -49,6 +47,9 @@ while True:
     mask[..., 2] = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX)
     #convert hsv to rgb
     rgb = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
+    #overlay the vectors on the frame
+    result = cv2.addWeighted(frame, 1, rgb, 2, 0)
+    cv2.imshow("input", result)
 
     #update previous frame
     prev_gray = gray
