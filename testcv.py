@@ -17,7 +17,7 @@ def draw_grid(frame, rows, cols):
         cv2.line(frame, (x, 0), (x, height), (0, 255, 0), 1)
 
 #Open MP4
-video_capture = cv2.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-07-27--06-03-57/3/video.hevc')
+video_capture = cv2.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-07-27--06-03-57/3/video.mp4')
 rows = 10
 cols = 10
 ret, first_frame = video_capture.read()
@@ -39,8 +39,8 @@ while True:
     #compute magnitude
     magnitude, angle = cv2.cartToPolar(flow[..., 0], flow[..., 1])
     #print magnitude and angle
-    print("Magnitude:", magnitude)
-    print("Angle:", angle)
+    #print("Magnitude:", magnitude)
+    #print("Angle:", angle)
     #set image hue
     mask[..., 0] = angle * 180 / np.pi /2
     #set image value
@@ -49,8 +49,33 @@ while True:
     rgb = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
     #overlay the vectors on the frame
     result = cv2.addWeighted(frame, 1, rgb, 2, 0)
+    #checking grid
+    # Loop through each grid cell
+# Calculate the height and width of each grid cell
+    grid_cell_height = frame.shape[0] / rows
+    grid_cell_width = frame.shape[1] / cols
+
+
+# Loop through each grid cell
+    for i in range(rows):
+        for j in range(cols):
+        # Calculate the top-left corner of the grid cell
+            y_start = int(i * grid_cell_height)
+            x_start = int(j * grid_cell_width)
+        
+        # Calculate the bottom-right corner of the grid cell
+            y_end = int((i + 1) * grid_cell_height) if i < rows - 1 else frame.shape[0]
+            x_end = int((j + 1) * grid_cell_width) if j < cols - 1 else frame.shape[1]
+        
+        # Calculate magnitude in the grid cell
+            avg_mag = np.mean(magnitude[y_start:y_end, x_start:x_end])
+        
+        # Print if there is any movement in the grid cell
+        if avg_mag > 0: #this value needs to be updated so we only get the ones we want to be printed...
+            print("Optical Flow Magnitudes for Grid Cell (", i, ",", j, "):", avg_mag)
+
     #result to see the vectors, frame to remove them.
-    cv2.imshow("input", result)
+    cv2.imshow("input",result)
 
     #update previous frame
     prev_gray = gray
