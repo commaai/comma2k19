@@ -17,9 +17,9 @@ def draw_grid(frame, rows, cols):
         cv2.line(frame, (x, 0), (x, height), (0, 255, 0), 1)
 
 #Open MP4
-video_capture = cv2.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-07-27--06-03-57/3/video.mp4')
-rows = 10
-cols = 10
+video_capture = cv2.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-07-27--06-03-57/11/video.hevc')
+rows = 20
+cols = 20
 ret, first_frame = video_capture.read()
 mask = np.zeros_like(first_frame)
 prev_gray = cv2.cvtColor(first_frame, cv2.COLOR_BGR2GRAY)
@@ -62,25 +62,22 @@ while True:
         # Calculate the top-left corner of the grid cell
             y_start = int(i * grid_cell_height)
             x_start = int(j * grid_cell_width)
-        
         # Calculate the bottom-right corner of the grid cell
             y_end = int((i + 1) * grid_cell_height) if i < rows - 1 else frame.shape[0]
             x_end = int((j + 1) * grid_cell_width) if j < cols - 1 else frame.shape[1]
-        
+            #print("Grid Cell Coordinates: (", y_start, ",", x_start, ") to (", y_end, ",", x_end, ")")
         # Calculate magnitude in the grid cell
             avg_mag = np.mean(magnitude[y_start:y_end, x_start:x_end])
-        
         # Print if there is any movement in the grid cell
-        if avg_mag > 0: #this value needs to be updated so we only get the ones we want to be printed...
-            print("Optical Flow Magnitudes for Grid Cell (", i, ",", j, "):", avg_mag)
-
+            if avg_mag > 10 and j > 3 and i < 14 and j < 16: #this value needs to be updated so we only get the ones we want to be printed...
+                print("Optical Flow Magnitudes for Grid Cell (", i, ",", j, "):", avg_mag)
     #result to see the vectors, frame to remove them.
     cv2.imshow("input",result)
 
     #update previous frame
     prev_gray = gray
     #Frames are read by intervals of 1 millisecond. The programs breaks out of the while loop when the user presses the "q" key
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(5) & 0xFF == ord('q'):
         break
 #realese the video capture
 cv2.getBuildInformation()
