@@ -69,7 +69,7 @@ while True:
         # Calculate magnitude in the grid cell
             avg_mag = np.mean(magnitude[y_start:y_end, x_start:x_end])
         # Print if there is any movement in the grid cell
-            if avg_mag > 10 and j > 3 and i < 14 and j < 16: #this value needs to be updated so we only get the ones we want to be printed...
+            if avg_mag < 0 and j > 3 and i < 14 and j < 16: #this value needs to be updated so we only get the ones we want to be printed...
                 print("Optical Flow Magnitudes for Grid Cell (", i, ",", j, "):", avg_mag)
     #result to see the vectors, frame to remove them.
     cv2.imshow("input",result)
@@ -77,7 +77,7 @@ while True:
     #update previous frame
     prev_gray = gray
     #Frames are read by intervals of 1 millisecond. The programs breaks out of the while loop when the user presses the "q" key
-    if cv2.waitKey(5) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 #realese the video capture
 cv2.getBuildInformation()
