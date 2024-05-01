@@ -96,8 +96,11 @@ while(cap.isOpened()):
     # Opens a new window and displays the output frame
     cv.imshow("sparse optical flow", output)
     # Frames are read by intervals of 10 milliseconds. The programs breaks out of the while loop when the user presses the 'q' key
-    if cv.waitKey(10) & 0xFF == ord('q'):
-        break
+    key = cv.waitKey(1) #if this is removed and manual for both then the second one doesn't work...
+    if key & 0xFF == ord('q'):
+        break    
+    if key == ord('p'):
+        cv.waitKey(-1)
 # The following frees up resources and closes all windows
 cap.release()
 cv.destroyAllWindows()
