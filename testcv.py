@@ -86,9 +86,12 @@ while(cap.isOpened()):
                 # Draw the circle
                 frame = cv.circle(frame, (a, b), 5, color, 3)
                 
-                if (old_col_position in [9, 7]) and (new_col_position in [9, 8]):
-                    print("Cut-in at position:", (a, b), "in grid cell", new_grid_cell, "from column", old_col_position, "to column", new_col_position)
-    
+                # Additional checks to filter out noisy points
+                if (0 <= a < frame.shape[1]) and (0 <= b < frame.shape[0]):
+                    # Check for the desired column transition
+                    if (old_col_position in [7, 8, 11, 12]) and (new_col_position in [9, 10]):
+                        print("Cut-in at position:", (a, b), "in grid cell", new_grid_cell, "from column", old_col_position, "to column", new_col_position)
+
     # Overlays the optical flow tracks on the original frame
     output = cv.add(frame, mask)
     # Updates previous frame
