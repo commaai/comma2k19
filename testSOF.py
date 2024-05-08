@@ -16,8 +16,8 @@ def draw_grid(frame, rows, cols):
         x = i * gridline_width
         cv.line(frame, (x, 0), (x, height), (150, 10, 150), 1)
 
-# Parameters for Shi-Tomasi corner detection
-feature_params = dict(maxCorners=300, qualityLevel=0.2, minDistance=2, blockSize=7)
+# Parameters for Shi-Tomasi corner detection minDistance defines how far side to side is required to identify the object. 
+feature_params = dict(maxCorners=300, qualityLevel=0.2, minDistance=100, blockSize=7)
 # Parameters for Lucas-Kanade optical flow
 lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
 # The video feed is read in as a VideoCapture object
@@ -86,6 +86,7 @@ while(cap.isOpened()):
                 mask = cv.line(mask, (a, b), (c, d), color, 2)
                 # Draw the circle
                 frame = cv.circle(frame, (a, b), 5, color, 3)
+                #want to add another if statment where if the circle moves from another column into the middle two columns is prints that there's a cut in.
     
     # Overlays the optical flow tracks on the original frame
     output = cv.add(frame, mask)

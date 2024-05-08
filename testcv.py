@@ -1,85 +1,108 @@
-import cv2
+import cv2 as cv
 import numpy as np
 
 def draw_grid(frame, rows, cols):
-    height, width, = frame.shape[:2]
-    #Calculate spacing
+    height, width = frame.shape[:2]
+    # Calculate spacing
     gridline_width = width // cols
     gridline_height = height // rows
 
-    #draw horizontal grid
+    # draw horizontal grid
     for i in range(1, rows):
         y = i * gridline_height
-        cv2.line(frame, (0, y), (width, y), (0, 255, 0), 1)
-    #Vertical
+        cv.line(frame, (0, y), (width, y), (150, 10, 150), 1)
+    # Vertical
     for i in range(1, cols):
         x = i * gridline_width
-        cv2.line(frame, (x, 0), (x, height), (0, 255, 0), 1)
+        cv.line(frame, (x, 0), (x, height), (150, 10, 150), 1)
 
-#Open MP4
-video_capture = cv2.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-07-27--06-03-57/11/video.hevc')
+# Parameters for Shi-Tomasi corner detection minDistance defines how far side to side is required to identify the object.
+feature_params = dict(maxCorners=300, qualityLevel=0.2, minDistance=100, blockSize=7)
+# Parameters for Lucas-Kanade optical flow
+lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
+# The video feed is read in as a VideoCapture object
+cap = cv.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-08-17--14-55-39/7/video.hevc')
 rows = 20
 cols = 20
-ret, first_frame = video_capture.read()
+# Variable for color to draw optical flow track
+color = (0, 255, 0)
+# ret = a boolean return value from getting the frame, first_frame = the first frame in the entire video sequence
+ret, first_frame = cap.read()
+# Converts frame to grayscale because we only need the luminance channel for detecting edges - less computationally expensive
+prev_gray = cv.cvtColor(first_frame, cv.COLOR_BGR2GRAY)
+# Finds the strongest corners in the first frame by Shi-Tomasi method - we will track the optical flow for these corners
+# https://docs.opencv.org/3.0-beta/modules/imgproc/doc/feature_detection.html#goodfeaturestotrack
+prev = cv.goodFeaturesToTrack(prev_gray, mask=None, **feature_params)
+# Creates an image filled with zero intensities with the same dimensions as the frame - for later drawing purposes
 mask = np.zeros_like(first_frame)
-prev_gray = cv2.cvtColor(first_frame, cv2.COLOR_BGR2GRAY)
-mask[..., 1] = 255
 
-#Loop frames
-while True:
-    if not video_capture.isOpened():
-        print("error")
-    #Read frames
-    ret, frame = video_capture.read()
-    draw_grid(frame, rows,cols)
-    #convert to gray scale
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    #calc dense optical flow
-    flow = cv2.calcOpticalFlowFarneback(prev_gray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-    #compute magnitude
-    magnitude, angle = cv2.cartToPolar(flow[..., 0], flow[..., 1])
-    #print magnitude and angle
-    #print("Magnitude:", magnitude)
-    #print("Angle:", angle)
-    #set image hue
-    mask[..., 0] = angle * 180 / np.pi /2
-    #set image value
-    mask[..., 2] = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX)
-    #convert hsv to rgb
-    rgb = cv2.cvtColor(mask, cv2.COLOR_HSV2BGR)
-    #overlay the vectors on the frame
-    result = cv2.addWeighted(frame, 1, rgb, 2, 0)
-    #checking grid
-    # Loop through each grid cell
-# Calculate the height and width of each grid cell
-    grid_cell_height = frame.shape[0] / rows
-    grid_cell_width = frame.shape[1] / cols
+# Calculate gridline width and height
+gridline_width = first_frame.shape[1] // cols
+gridline_height = first_frame.shape[0] // rows
 
-
-# Loop through each grid cell
-    for i in range(rows):
-        for j in range(cols):
-        # Calculate the top-left corner of the grid cell
-            y_start = int(i * grid_cell_height)
-            x_start = int(j * grid_cell_width)
-        # Calculate the bottom-right corner of the grid cell
-            y_end = int((i + 1) * grid_cell_height) if i < rows - 1 else frame.shape[0]
-            x_end = int((j + 1) * grid_cell_width) if j < cols - 1 else frame.shape[1]
-            #print("Grid Cell Coordinates: (", y_start, ",", x_start, ") to (", y_end, ",", x_end, ")")
-        # Calculate magnitude in the grid cell
-            avg_mag = np.mean(magnitude[y_start:y_end, x_start:x_end])
-        # Print if there is any movement in the grid cell
-            if avg_mag < 0 and j > 3 and i < 14 and j < 16: #this value needs to be updated so we only get the ones we want to be printed...
-                print("Optical Flow Magnitudes for Grid Cell (", i, ",", j, "):", avg_mag)
-    #result to see the vectors, frame to remove them.
-    cv2.imshow("input",result)
-
-    #update previous frame
-    prev_gray = gray
-    #Frames are read by intervals of 1 millisecond. The programs breaks out of the while loop when the user presses the "q" key
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+while(cap.isOpened()):
+    # Clear the mask for drawing lines
+    mask[:] = 0
+    
+    # ret = a boolean return value from getting the frame, frame = the current frame being projected in the video
+    ret, frame = cap.read()
+    if not ret:
         break
-#realese the video capture
-cv2.getBuildInformation()
-video_capture.release()
-cv2.destroyAllWindows()
+    draw_grid(frame, rows, cols)
+    # Converts each frame to grayscale - we previously only converted the first frame to grayscale
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    # Calculates sparse optical flow by Lucas-Kanade method
+    prev = cv.goodFeaturesToTrack(prev_gray, mask=None, **feature_params)
+    next, status, error = cv.calcOpticalFlowPyrLK(prev_gray, gray, prev, None, **lk_params)
+    # Selects good feature points for previous position
+    good_old = prev[status == 1].astype(int)
+    # Selects good feature points for next position
+    good_new = next[status == 1].astype(int)
+
+    # Draw the optical flow tracks
+    for i, (new, old) in enumerate(zip(good_new, good_old)):
+        # Returns a contiguous flattened array as (x, y) coordinates for new point
+        a, b = new.ravel()
+        # Returns a contiguous flattened array as (x, y) coordinates for old point
+        c, d = old.ravel()
+        
+        # Calculate the grid cell of the new position
+        new_grid_col = min(max(0, a // gridline_width), cols - 1)
+        new_grid_row = min(max(0, b // gridline_height), rows - 1)
+        new_grid_cell = (new_grid_col, new_grid_row)
+        
+        # Calculate the column position of the new position
+        new_col_position = new_grid_col
+        
+        # Get the column position of the old position
+        old_col_position = min(max(0, c // gridline_width), cols - 1)
+        
+        # If both old and new column positions are not None and the feature point is in the included rows and columns
+        if old_col_position is not None and new_col_position is not None:
+            # Check if the feature point is in the included rows and columns
+            if not (b < 7 * gridline_height or b >= 15 * gridline_height or (new_col_position <= 3 or new_col_position >= 17)):
+                # Draw the line
+                mask = cv.line(mask, (a, b), (c, d), color, 2)
+                # Draw the circle
+                frame = cv.circle(frame, (a, b), 5, color, 3)
+                
+                if (old_col_position in [9, 7]) and (new_col_position in [9, 8]):
+                    print("Cut-in at position:", (a, b), "in grid cell", new_grid_cell, "from column", old_col_position, "to column", new_col_position)
+    
+    # Overlays the optical flow tracks on the original frame
+    output = cv.add(frame, mask)
+    # Updates previous frame
+    prev_gray = gray.copy()
+
+    # Opens a new window and displays the output frame
+    cv.imshow("sparse optical flow", output)
+    # Frames are read by intervals of 10 milliseconds. The programs breaks out of the while loop when the user presses the 'q' key
+    key = cv.waitKey(1)
+    if key & 0xFF == ord('q'):
+        break
+    if key == ord('p'):
+        cv.waitKey(-1)
+
+# Release the VideoCapture object and close all windows
+cap.release()
+cv.destroyAllWindows()
