@@ -16,13 +16,15 @@ def draw_grid(frame, rows, cols):
         x = i * gridline_width
         cv.line(frame, (x, 0), (x, height), (150, 10, 150), 1)
 
+my_path = '../comma2k/Chunk_1/b0c9d2329ad1606b|2018-08-17--14-55-39/7/video.hevc'
+
 # Parameters for Shi-Tomasi corner detection minDistance defines how far side to side is required to identify the object.
 feature_params = dict(maxCorners=300, qualityLevel=0.2, minDistance=100, blockSize=7)
 # Parameters for Lucas-Kanade optical flow
 lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
 # The video feed is read in as a VideoCapture object
-cap = cv.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-08-17--14-55-39/7/video.hevc')
-rows = 20
+cap = cv.VideoCapture(my_path)
+rows = 20 
 cols = 20
 # Variable for color to draw optical flow track
 color = (0, 255, 0)
