@@ -15,14 +15,31 @@ def draw_grid(frame, rows, cols):
     for i in range(1, cols):
         x = i * gridline_width
         cv.line(frame, (x, 0), (x, height), (150, 10, 150), 1)
+        cv.putText(frame, str(i), (x + 10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
-# Parameters for Shi-Tomasi corner detection
-feature_params = dict(maxCorners=300, qualityLevel=0.2, minDistance=2, blockSize=7)
+paths = [
+    '../comma2k/Chunk_1/b0c9d2329ad1606b|2018-08-17--14-55-39/7/video.hevc', # Jen's path
+    '../comma2k/Chunk_2/b0c9d2329ad1606b|2018-10-09--14-06-32/10/video.hevc', #doesnt work well
+    '../comma2k/Chunk_2/b0c9d2329ad1606b|2018-09-23--12-52-06/45/video.hevc', # detects all cut-ins, no false positives 
+    '../comma2k/Chunk_2/b0c9d2329ad1606b|2018-10-09--15-48-37/16/video.hevc' # works well
+]
+
+my_path = paths[2]
+maxCorners = 20
+qualityLevel = 0.1
+minDistance = 100
+blockSize = 2
+winsize = (15, 15)
+maxLevel = 2
+criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 0.03)
+
+# Parameters for Shi-Tomasi corner detection minDistance defines how far side to side is required to identify the object.
+feature_params = dict(maxCorners=maxCorners, qualityLevel=qualityLevel, minDistance=minDistance, blockSize=blockSize)
 # Parameters for Lucas-Kanade optical flow
-lk_params = dict(winSize=(15, 15), maxLevel=2, criteria=(cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 0.03))
+lk_params = dict(winSize=winsize, maxLevel=maxLevel, criteria=criteria)
 # The video feed is read in as a VideoCapture object
-cap = cv.VideoCapture('../comma2k/Chunk_1/b0c9d2329ad1606b|2018-07-27--06-03-57/3/video.mp4')
-rows = 20
+cap = cv.VideoCapture(my_path)
+rows = 20 
 cols = 20
 # Variable for color to draw optical flow track
 color = (0, 255, 0)
@@ -40,6 +57,11 @@ mask = np.zeros_like(first_frame)
 gridline_width = first_frame.shape[1] // cols
 gridline_height = first_frame.shape[0] // rows
 
+# Create a separate output window
+cv.namedWindow("Output", cv.WINDOW_NORMAL)
+cv.resizeWindow("Output", 1000, 800)
+
+# Main loop
 while(cap.isOpened()):
     # Clear the mask for drawing lines
     mask[:] = 0
@@ -59,10 +81,7 @@ while(cap.isOpened()):
     # Selects good feature points for next position
     good_new = next[status == 1].astype(int)
 
-    # Print number of feature points detected
-    print("Number of feature points:", len(good_new))
-
-    # Draws the optical flow tracks
+    # Draw the optical flow tracks
     for i, (new, old) in enumerate(zip(good_new, good_old)):
         # Returns a contiguous flattened array as (x, y) coordinates for new point
         a, b = new.ravel()
@@ -70,37 +89,48 @@ while(cap.isOpened()):
         c, d = old.ravel()
         
         # Calculate the grid cell of the new position
-        new_grid_cell = (a // gridline_width, b // gridline_height)
+        new_grid_col = min(max(0, a // gridline_width), cols - 1)
+        new_grid_row = min(max(0, b // gridline_height), rows - 1)
+        new_grid_cell = (new_grid_col, new_grid_row)
         
         # Calculate the column position of the new position
-        new_col_position = new_grid_cell[0] if new_grid_cell[0] is not None else None
+        new_col_position = new_grid_col
         
         # Get the column position of the old position
-        old_col_position = new_grid_cell[0] if new_grid_cell[0] is not None else None
+        old_col_position = min(max(0, c // gridline_width), cols - 1)
         
         # If both old and new column positions are not None and the feature point is in the included rows and columns
         if old_col_position is not None and new_col_position is not None:
-            # Check if the feature point is in the included rows (greater than 6) and columns (greater than 3 and less than 17)
+            # Check if the feature point is in the included rows and columns
             if not (b < 7 * gridline_height or b >= 15 * gridline_height or (new_col_position <= 3 or new_col_position >= 17)):
                 # Draw the line
                 mask = cv.line(mask, (a, b), (c, d), color, 2)
                 # Draw the circle
                 frame = cv.circle(frame, (a, b), 5, color, 3)
-    
+                
+                # Additional checks to filter out noisy points
+                if (0 <= a < frame.shape[1]) and (0 <= b < frame.shape[0]):
+                    # Check for the desired column transition
+                    if (old_col_position in [7,8,11,12]) and (new_col_position in [9,10]):
+                        # Mark the detected cut-in position with a red box
+                        cv.rectangle(frame, (a - 20, b - 20),(a + 20, b + 20), (0, 0, 255), 2)
+                        print("Cut-in at position:", (a, b), "in grid cell", new_grid_cell, "from column", old_col_position, "to column", new_col_position)
+                        # Pause video and wait for user input
+                        cv.waitKey(0)
+
     # Overlays the optical flow tracks on the original frame
     output = cv.add(frame, mask)
     # Updates previous frame
     prev_gray = gray.copy()
 
     # Opens a new window and displays the output frame
-    cv.imshow("sparse optical flow", output)
+    cv.imshow("Output", output)
     # Frames are read by intervals of 10 milliseconds. The programs breaks out of the while loop when the user presses the 'q' key
     key = cv.waitKey(1)
     if key & 0xFF == ord('q'):
         break
-    if key == ord('p'):
-        cv.waitKey(-1)
-    
-# The following frees up resources and closes all windows
+
+# Release the VideoCapture object and close all windows
 cap.release()
 cv.destroyAllWindows()
+
