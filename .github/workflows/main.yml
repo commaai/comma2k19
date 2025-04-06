@@ -10,10 +10,10 @@ jobs:
         with:
           submodules: true
           lfs: true
-      - name: Python 3.7
+      - name: Python 3.8
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Dependencies
         run: |
           sudo apt-get install libcurl4-openssl-dev
